@@ -18,25 +18,25 @@ Most hobby TVC projects either hardcode control logic directly into loop(), or c
 main.cpp is intentionally thin. It initializes hardware, wires modules together, registers tasks with a cooperative scheduler, and does nothing else. Every real behavior — sensor fusion, state transitions, control math — lives in its own module, independent of any specific microcontroller.
 The flight logic must run identically on a laptop and on the flight computer. Because the peripheral drivers are cleanly separated from the control/estimation code, the exact same MadgwickFilter, AltitudeEstimator, FlightStateMachine, and TVCController classes that fly on the rocket can be linked into a plain PC binary and fed a simulated flight. That's what Simulation Files/sim_flight.cpp does — it's not a re-implementation or a mock, it's the production code under test.
 System architecture
-                     ┌─────────────────────────────────────────┐
-                     │              main.cpp                    │
-                     │   (init hardware → wire modules →         │
-                     │    register scheduler tasks → loop)       │
-                     └───────────────────┬───────────────────────┘
-                                         │
-        ┌────────────────┬───────────────┼───────────────┬────────────────┐
-        │                │               │               │                │
-   1000 Hz           50 Hz           500 Hz          100 Hz            10 Hz
-  taskImuRead     taskBaroRead   taskControlLoop    taskLogData     taskStatusUpdate
-        │                │               │               │                │
-        ▼                ▼               ▼               ▼                ▼
-  ┌───────────┐   ┌──────────────┐  ┌────────────┐  ┌────────────┐  ┌───────────────┐
-  │ ICM-45686 │   │   BMP580     │  │ FlightState │  │FlightLogger│  │  StatusLED /  │
-  │  (IMU)    │   │ (barometer)  │  │  Machine +  │  │  (SD, CSV) │  │ FaultManager /│
-  │    ↓      │   │      ↓       │  │TVCController│  │            │  │   Watchdog    │
-  │Madgwick   │   │  Altitude    │  │             │  │            │  │               │
-  │ Filter    │   │  Estimator   │  │             │  │            │  │               │
-  └───────────┘   └──────────────┘  └────────────┘  └────────────┘  └───────────────┘
+                               ┌───────────────────────────────────────────┐
+                               │                 main.cpp                  │
+                               │      (init hardware → wire modules →      │
+                               │     register scheduler tasks → loop)      │
+                               └───────────────────┬───────────────────────┘
+                                                   │
+                  ┌────────────────┬───────────────┼───────────────┬────────────────┐
+                  │                │               │               │                │
+               1000 Hz           50 Hz           500 Hz          100 Hz            10 Hz
+            taskImuRead     taskBaroRead   taskControlLoop    taskLogData     taskStatusUpdate
+                  │                │               │               │                │
+                  ▼                ▼               ▼               ▼                ▼
+            ┌───────────┐   ┌──────────────┐  ┌────────────┐  ┌────────────┐  ┌───────────────┐
+            │ ICM-45686 │   │   BMP580     │  │ FlightState │ │FlightLogger│  │  StatusLED /  │
+            │  (IMU)    │   │ (barometer)  │  │  Machine +  │ │  (SD, CSV) │  │ FaultManager /│
+            │    ↓      │   │      ↓       │  │TVCController│ │            │  │   Watchdog    │
+            │Madgwick   │   │  Altitude    │  │             │ │            │  │               │
+            │ Filter    │   │  Estimator   │  │             │ │            │  │               │
+            └───────────┘   └──────────────┘  └─────────────┘ └────────────┘  └───────────────┘
 
 A single cooperative Scheduler (driven by a 1 ms hardware timer tick) runs five tasks at five different rates, all sharing one FlightData snapshot struct rather than passing data through queues — appropriate for a single-core control loop where every task runs to completion before the next one starts.
 
