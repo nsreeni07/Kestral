@@ -6,13 +6,6 @@
 // TVCController, PIDController — against a synthetic sensor feed
 // generated from a simple rocket flight model, so you can validate
 // control logic and tune gains before anything touches real hardware.
-//
-// Build (from the project root):
-//   g++ -std=c++17 -Iinclude src/ahrs.cpp src/state_machine.cpp \
-//       src/tvc_control.cpp src/peripherals.cpp sim/sim_flight.cpp \
-//       -o sim_flight
-//   ./sim_flight > flight_log.csv
-//
 // What the synthetic flight does:
 //   0.0s - 0.3s   : on the pad (ARMED), sitting at 1g, small noise
 //   0.3s - 2.0s   : POWERED_ASCENT, ~6g net accel, with an injected
@@ -132,7 +125,7 @@ int main() {
 
         float pressure_hpa = ground_pressure_hpa * std::pow(1.0f - (true_altitude_m / 44330.0f), 5.25588f);
 
-        // ---- Feed the REAL production modules ----
+        
         // AHRS beta schedule (mirrors main.cpp logic)
         switch (state_machine.currentState()) {
             case Flight::State::IDLE:
