@@ -12,10 +12,10 @@ Simulation Files/    → PC simulation of the same code + an HTML dashboard
 A cooperative scheduler runs five tasks at different rates, all sharing one data snapshot:
 
 - **1000 Hz** — read IMU, update Madgwick attitude filter
-- **500 Hz** — update flight state machine, run TVC control loop
-- **100 Hz** — log data to SD
-- **50 Hz** — read barometer, update altitude/velocity estimate
-- **10 Hz** — update status LED, feed watchdog
+- **500 Hz**  — update flight state machine, run TVC control loop
+- **100 Hz**  — log data to SD
+- **50 Hz**   — read barometer, update altitude/velocity estimate
+- **10 Hz**   — update status LED, feed watchdog
 
 **Flight sequence:** `IDLE → ARMED → LAUNCH_DETECTED → POWERED_ASCENT → COAST → APOGEE → DESCENT → LANDED`, with a `FAULT` state reachable from anywhere. Each transition requires a sustained condition (not just one noisy sample) to avoid false triggers.
 
