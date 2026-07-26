@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build flight sim",
+      "type": "shell",
+      "command": "g++",
+      "args": [
+        "-std=c++17",
+        "-Iinclude",
+        "src/ahrs.cpp",
+        "src/state_machine.cpp",
+        "src/tvc_control.cpp",
+        "src/peripherals.cpp",
+        "src/sensors.cpp",
+        "sim/sim_flight.cpp",
+        "-o",
+        "sim_flight"
+      ],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Run flight sim -> CSV",
+      "type": "shell",
+      "command": "./sim_flight > flight_log.csv",
+      "dependsOn": "Build flight sim",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
